@@ -15,13 +15,10 @@ def load_data(messages_filepath, categories_filepath):
 def clean_data(df):
     categories = df['categories'].str.split(pat=';', expand=True)
     row = categories.loc[0]
-    colnames = []
-    for entry in row:
-        colnames.append(entry[:-2])
-    category_colnames = colnames
+    category_colnames = [category_name.split('-')[0] for category_name in row.values]
+    categories.columns = category_colnames
     for column in categories:
-        categories[column] = categories[column].str[-1:]
-        categories[column] = categories[column].astype(int)
+        categories[column] = categories[column].str[-1:].astype(int)
     df.drop('categories', axis=1, inplace=True)
     df = pd.concat([df, categories], axis=1)
     df.drop_duplicates(inplace=True)
@@ -30,7 +27,6 @@ def clean_data(df):
 
 def save_data(df, database_filename):
   engine = create_engine('sqlite:///{}'.format(database_filename))
-
   df.to_sql('df_clean', engine, index=False, if_exists='replace')
 
 def main():
