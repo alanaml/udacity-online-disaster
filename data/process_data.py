@@ -21,6 +21,7 @@ def clean_data(df):
         categories[column] = categories[column].str[-1:].astype(int)
     df.drop('categories', axis=1, inplace=True)
     df = pd.concat([df, categories], axis=1)
+    df['related'] = categories['related'].replace(2,0)
     df.drop_duplicates(inplace=True)
     return df
 
