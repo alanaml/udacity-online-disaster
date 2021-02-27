@@ -68,6 +68,16 @@ def index():
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
+    # Top 5 categories
+    top_5_category_count = df.iloc[:,4:].sum().sort_values(ascending=False)[1:6]
+    top_5_category_names = list(top_5_category_count.index)
+    # Top 10 categories
+    top_10_category_count = df.iloc[:,4:].sum().sort_values(ascending=False)[1:11]
+    top_10_category_names = list(top_10_category_count.index)
+    # Top 10 categories
+    top_all_category_count = df.iloc[:,4:].sum().sort_values(ascending=False)[1:]
+    top_all_category_names = list(top_all_category_count.index)
+    
     graphs = [
         {
             'data': [
@@ -84,6 +94,60 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=top_5_category_names,
+                    y=top_5_category_count
+                )
+            ],
+
+            'layout': {
+                'title': 'Top Five Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Categories"
+                }
+            }
+        },
+         {
+            'data': [
+                Bar(
+                    x=top_10_category_names,
+                    y=top_10_category_count
+                )
+            ],
+
+            'layout': {
+                'title': 'Top Ten Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Categories"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=top_all_category_names,
+                    y=top_all_category_count
+                )
+            ],
+
+            'layout': {
+                'title': 'All Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Categories"
                 }
             }
         }
@@ -119,6 +183,9 @@ def go():
 
 
 def main():
+    import os
+    print("Access:")
+    print(f"http://{os.environ['WORKSPACEID']}-3001.{os.environ['WORKSPACEDOMAIN']}")
     app.run(host='0.0.0.0', port=3001, debug=True)
 
 
