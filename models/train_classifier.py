@@ -31,6 +31,17 @@ nltk.download(['punkt', 'wordnet'])
 url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 def load_data(database_filepath):
+    """
+    Loads data from SQL Database
+
+    Args:
+        database_filepath: path to SQL database
+
+    Returns:
+        X: Message data (features)
+        Y: Categories (target)
+        category_names: Labels for the 36 categories
+    """
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table('df_clean', engine)
     X = df['message']
@@ -39,24 +50,35 @@ def load_data(database_filepath):
     return X, Y, category_names
 
 def tokenize(text):
-    # normalized text and remove punctuation
+    """
+    Processed text data
+
+    Args:
+        text (list): Text to be processed
+
+    Returns:
+       clean_tokens (list): list of clean tokens, that was tokenized, lower cased, stripped, 
+       and lemmatized
+    """
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
-    # Extract all the urls from the provided text
     detected_urls = re.findall(url_regex, text)
-    # Replace url with a url placeholder string
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
-    # Extract the word tokens from the provided text
     tokens = nltk.word_tokenize(text)
-    # Lemmanitizer to remove inflectional and derivationally related forms of a word
     lemmatizer = nltk.WordNetLemmatizer()
-
     clean_tokens = [lemmatizer.lemmatize(w).lower().strip() for w in tokens]
-    # List of clean tokens
     return clean_tokens
 
 
 def build_model():
+    """
+    Build a Machine Learning pipeline with AdaBoost classifier GridSearch.
+    Args:
+        none
+    Returns:
+        ML pipeline (ml_model): that has gone through tokenization, count vectorization and
+        TFIDTransofmration
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -73,18 +95,33 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Evaluate model performance
+
+    Args:
+        model (ml_model): model to be evaluated
+        X_test (dataframe): Input features, testing set
+        Y_test (dataframe): Input target, testing set
+        category_names (list): List of the categories 
+    """
     y_pred = model.predict(X_test)
     
     print(classification_report(Y_test, y_pred, target_names = category_names))
 
     
 
-
 def save_model(model, model_filepath):
+    """
+    Save into a pickle file
+    Args:
+        model (ml_model):  Model to be saved
+        model_filepath : path of the output 
+    """
+
     pickle.dump(model, open(model_filepath, 'wb'))
-    
 
 def main():
+
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
