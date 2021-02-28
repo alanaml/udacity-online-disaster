@@ -3,7 +3,6 @@
 - Libraries
 - Project Motivation 
 - Project Description
-- Project Description
 - Repository 
 - Results
 - Instruction to run
