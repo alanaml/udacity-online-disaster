@@ -185,7 +185,10 @@ def go():
 def main():
     import os
     print("Access:")
-    print(f"http://{os.environ['WORKSPACEID']}-3001.{os.environ['WORKSPACEDOMAIN']}")
+    try:
+        print(f"http://{os.environ['WORKSPACEID']}-3001.{os.environ['WORKSPACEDOMAIN']}")
+    except KeyError:
+        print(f"http://0.0.0.0:3001")
     app.run(host='0.0.0.0', port=3001, debug=True)
 
 
